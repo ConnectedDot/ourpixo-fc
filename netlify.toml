@@ -1,0 +1,62 @@
+# Netlify configuration file
+# https://docs.netlify.com/configure-builds/file-based-configuration/
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Environment variables (set these in Netlify UI for production)
+# VITE_EMAILJS_SERVICE_ID
+# VITE_EMAILJS_TEMPLATE_ID
+# VITE_EMAILJS_PUBLIC_KEY
+# VITE_ADMIN_EMAIL
+# VITE_GA_MEASUREMENT_ID
+
+# Redirect rules
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security Headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Security Headers
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+    
+    # Content Security Policy
+    Content-Security-Policy = """
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.emailjs.com https://www.googletagmanager.com https://www.google-analytics.com;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      img-src 'self' data: https: blob:;
+      font-src 'self' https://fonts.gstatic.com;
+      connect-src 'self' https://api.emailjs.com https://www.google-analytics.com https://analytics.google.com;
+      frame-ancestors 'none';
+      base-uri 'self';
+      form-action 'self';
+    """
+    
+    # Cache Control for static assets
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Custom 404 page
+[[redirects]]
+  from = "/404"
+  to = "/404.html"
+  status = 404
