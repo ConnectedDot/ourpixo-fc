@@ -74,6 +74,7 @@
 
 
 // src/lib/drive.ts
+
 export type DriveFile = {
   id: string;
   name: string;
@@ -94,27 +95,35 @@ export type DrivePayload = {
   nextPageToken?: string | null;
 };
 
-export async function listDrive(folderId?: string, pageToken?: string, pageSize = 48): Promise<DrivePayload> {
-  const params = new URLSearchParams();
-  if (folderId) params.set('folderId', folderId);
-  if (pageToken) params.set('pageToken', pageToken);
-  if (pageSize) params.set('pageSize', String(pageSize));
+export async function listDrive(
+  folderId?: string,
+  pageToken?: string,
+  pageSize = 48
+): Promise<DrivePayload> {
 
-  const url = `/api/drive/list${params.toString() ? `?${params.toString()}` : ''}`;
+  const params = new URLSearchParams();
+  if (folderId) params.set("folderId", folderId);
+  if (pageToken) params.set("pageToken", pageToken);
+  params.set("pageSize", String(pageSize));
+
+  const url = `/api/drive/list?${params.toString()}`;
 
   const r = await fetch(url);
   if (!r.ok) throw new Error(`Drive list failed: ${r.status}`);
+
   const data: DrivePayload = await r.json();
 
-  // IMPORTANT: render images through our backend proxy (privacy-safe)
+  // Build proxied thumbnail + full-view URLs
   data.files = data.files.map((f) => {
-    const proxied = `/api/drive/image?id=${f.id}`;
+    const thumbUrl = `/api/drive/thumb?id=${f.id}&w=350`;
+    const fullUrl = `/api/drive/image?id=${f.id}`;
     return {
       ...f,
-      viewUrl: proxied,
-      thumb: proxied,
-      // keep downloadUrl as-is, or also proxy via backend:
-      // downloadUrl: proxied
+      thumb: thumbUrl,
+      viewUrl: fullUrl,
+      // Optionally proxy downloads too:
+      // downloadUrl: fullUrl,
+      downloadUrl: f.downloadUrl,
     };
   });
 

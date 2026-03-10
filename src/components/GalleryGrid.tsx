@@ -37,8 +37,8 @@ export default function GalleryGrid({
 }) {
 	return (
 		<div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-4">
-			{files.map((f, i) => (
-				<Tile key={f.id} file={f} onClick={() => onOpen(i)} />
+			{files.map((file, i) => (
+				<Tile key={file.id} file={file} onClick={() => onOpen(i)} />
 			))}
 		</div>
 	);
@@ -50,16 +50,17 @@ function Tile({file, onClick}: {file: DriveFile; onClick: () => void}) {
 	return (
 		<div className="mb-4 break-inside-avoid">
 			{!loaded && (
-				<div className="w-full aspect-[4/3] rounded-xl bg-gray-200 animate-pulse"></div>
+				<div className="w-full aspect-[4/3] bg-gray-200 rounded-xl animate-pulse"></div>
 			)}
+
 			<img
-				src={file.thumb || file.viewUrl}
-				onClick={onClick}
+				src={file.thumb!}
+				alt={file.name}
 				onLoad={() => setLoaded(true)}
-				className={`w-full rounded-xl shadow-sm hover:shadow-xl cursor-pointer transition 
-        duration-300 object-cover ${
-					loaded ? "opacity-100 animate-fadeIn" : "opacity-0"
-				}`}
+				onClick={onClick}
+				loading="lazy"
+				className={`w-full rounded-xl shadow-sm hover:shadow-lg transition duration-300 cursor-pointer 
+        object-cover ${loaded ? "opacity-100 animate-fadeIn" : "opacity-0"}`}
 			/>
 		</div>
 	);
