@@ -4,6 +4,8 @@ import MasonryGallery from "./components/MasonryGallery";
 import SearchBar from "./components/SearchBar";
 import {createSearch} from "./lib/ai-search";
 import {listDrive, type DriveFile, type DriveFolder} from "./lib/drive";
+import FolderGrid from "./components/FolderCard";
+import Hero from "./components/HeroSection";
 
 export default function App() {
 	const [folders, setFolders] = useState<DriveFolder[]>([]); // Add this
@@ -11,13 +13,16 @@ export default function App() {
 	const [filtered, setFiltered] = useState<DriveFile[]>([]);
 	const [active, setActive] = useState<number | null>(null);
 	const [currentFolderId, setCurrentFolderId] = useState<string | undefined>();
+	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
 		// Use your listDrive helper to get formatted URLs automatically
+		setLoading(true);
 		listDrive(currentFolderId).then(data => {
 			setFolders(data.folders || []);
 			setFiles(data.files || []);
 			setFiltered(data.files || []);
+			setLoading(false); // End loading
 		});
 	}, [currentFolderId]); // Re-run when folder changes
 
@@ -28,10 +33,9 @@ export default function App() {
 	}
 
 	return (
-		<div className="p-6">
-			<SearchBar onSearch={handleSearch} />
+		<div className="p-0">
+			{/* <SearchBar onSearch={handleSearch} />
 
-			{/* Render Folders if they exist */}
 			{folders.length > 0 && (
 				<div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
 					{folders.map(folder => (
@@ -47,7 +51,6 @@ export default function App() {
 				</div>
 			)}
 
-			{/* Back Button if inside a folder */}
 			{currentFolderId && (
 				<button
 					onClick={() => setCurrentFolderId(undefined)}
@@ -57,7 +60,6 @@ export default function App() {
 				</button>
 			)}
 
-			{/* Render Files */}
 			{filtered.length > 0 ?
 				<MasonryGallery files={filtered} onOpen={setActive} />
 			:	!folders.length && (
@@ -65,16 +67,66 @@ export default function App() {
 						No items found here.
 					</div>
 				)
-			}
+			} */}
 
-			{active !== null && (
-				<Lightbox
-					files={filtered}
-					index={active}
-					onClose={() => setActive(null)}
-					onNavigate={setActive}
-				/>
-			)}
+			<div className="min-h-screen bg-[#fafafa]">
+				<Hero onSearch={handleSearch} />
+
+				<div className="max-w-[1400px] mx-auto px-6 pb-20">
+					{loading ?
+						// <div className="flex flex-col items-center justify-center py-20">
+						// 	<div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+						// 	<p className="text-gray-500 animate-pulse text-sm font-medium">
+						// 		Fetching your memories...
+						// 	</p>
+						// </div>
+
+						<div className="flex flex-col items-center justify-center py-32 space-y-6">
+							<div className="relative">
+								<div className="w-16 h-16 border-4 border-blue-100 rounded-full"></div>
+								<div className="absolute inset-0 w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+							</div>
+							<p className="text-gray-500 font-medium animate-pulse">
+								Organizing your gallery...
+							</p>
+						</div>
+					:	<>
+							{/* Folders first, then Gallery */}
+							{folders.length > 0 && (
+								<FolderGrid folders={folders} onSelect={setCurrentFolderId} />
+							)}
+
+							{currentFolderId && (
+								<button
+									onClick={() => setCurrentFolderId(undefined)}
+									className="flex items-center gap-2 mt-4 mb-8 text-sm font-bold text-gray-400 hover:text-blue-600 transition-colors"
+								>
+									<svg
+										className="w-4 h-4"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path d="M15 19l-7-7 7-7" strokeWidth="3" />
+									</svg>
+									BACK TO ALBUMS
+								</button>
+							)}
+
+							<MasonryGallery files={filtered} onOpen={setActive} />
+						</>
+					}
+				</div>
+
+				{active !== null && (
+					<Lightbox
+						files={filtered}
+						index={active}
+						onClose={() => setActive(null)}
+						onNavigate={setActive}
+					/>
+				)}
+			</div>
 		</div>
 	);
 }
