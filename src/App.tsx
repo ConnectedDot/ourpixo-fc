@@ -292,8 +292,8 @@
 // 	);
 // }
 import {useEffect, useState} from "react";
-import MasonryGallery from "./components/MasonryGallery";
 import Lightbox from "./components/Lightbox";
+import MasonryGallery from "./components/MasonryGallery";
 import SearchBar from "./components/SearchBar";
 import {createSearch} from "./lib/ai-search";
 import type {DriveFile} from "./lib/drive";
