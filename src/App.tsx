@@ -10,6 +10,7 @@ export default function App() {
 	const [folders, setFolders] = useState<DriveFolder[]>([]);
 	const [files, setFiles] = useState<DriveFile[]>([]);
 	const [filtered, setFiltered] = useState<DriveFile[]>([]);
+	const [datas, setData] = useState<[]>([]);
 	const [active, setActive] = useState<number | null>(null);
 	const [currentFolderId, setCurrentFolderId] = useState<string | undefined>();
 	const [loading, setLoading] = useState(false);
@@ -23,9 +24,12 @@ export default function App() {
 			setFolders(data.folders || []);
 			setFiles(data.files || []);
 			setFiltered(data.files || []);
+			setData(data as any);
 			setLoading(false);
 		});
 	}, [currentFolderId]);
+	console.log(filtered, "filtered in App.tsx");
+	console.log(datas, "data in App.tsx");
 
 	const search = createSearch(files);
 
@@ -82,8 +86,12 @@ export default function App() {
 									BACK TO ALBUMS
 								</button>
 
-								<span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">
+								{/* <span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">
 									{filtered.length} Photos
+								</span> */}
+
+								<span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-100 px-2 py-1 rounded-md">
+									{filtered.length} {filtered.length === 1 ? "Photo" : "Photos"}
 								</span>
 							</div>
 						)}
