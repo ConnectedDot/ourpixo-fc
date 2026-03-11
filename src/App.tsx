@@ -237,7 +237,8 @@ export default function App() {
 							{Array.from({length: 12}).map((_, i) => (
 								<div
 									key={i}
-									className="aspect-[4/3] rounded-xl bg-gray-200 animate-pulse"
+									className="aspect-[4/3] rounded-xl skeleton"
+									// className="aspect-[4/3] rounded-xl bg-gray-200 animate-pulse"
 								/>
 							))}
 						</div>
@@ -276,6 +277,13 @@ export default function App() {
 					onNavigate={i => setActive(i)}
 				/>
 			)}
+
+			<button
+				onClick={() => window.scrollTo({top: 0, behavior: "smooth"})}
+				className="fixed bottom-6 right-6 bg-faithBlue text-white p-3 rounded-full shadow-lg"
+			>
+				↑
+			</button>
 
 			<footer className="mt-20 py-10 text-center text-gray-500 text-sm">
 				© {new Date().getFullYear()} RCCG Faith City. All Rights Reserved.

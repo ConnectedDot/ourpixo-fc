@@ -78,6 +78,7 @@
 
 import {useEffect, useRef} from "react";
 import type {DriveFile} from "../lib/drive";
+import {motion} from "framer-motion";
 
 export default function Lightbox({
 	files,
@@ -121,10 +122,18 @@ export default function Lightbox({
 				✕
 			</button>
 
-			<img
+			{/* <img
 				src={f.viewUrl}
 				className="max-h-[85vh] object-contain rounded-2xl shadow-2xl"
 				fetchPriority="high"
+			/> */}
+
+			<motion.img
+				src={f.viewUrl}
+				initial={{opacity: 0, scale: 0.95}}
+				animate={{opacity: 1, scale: 1}}
+				transition={{duration: 0.25}}
+				className="max-h-[85vh] object-contain rounded-2xl shadow-2xl"
 			/>
 
 			<div className="absolute bottom-8 text-white text-center">

@@ -12,6 +12,7 @@ function getAuth() {
     ]);
 }
 
+
 export default async function handler(req: any, res: any) {
     try {
         const id = (req.query.id as string) || "";

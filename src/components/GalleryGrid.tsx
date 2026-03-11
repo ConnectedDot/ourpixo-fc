@@ -36,7 +36,8 @@ export default function GalleryGrid({
 	onOpen: (index: number) => void;
 }) {
 	return (
-		<div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-4">
+		<div className="animate-fadeIn columns-2 sm:columns-3 md:columns-4 xl:columns-5 gap-5">
+			{/* <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-5 mb-5"> */}
 			{files.map((file, i) => (
 				<Tile key={file.id} file={file} onClick={() => onOpen(i)} />
 			))}
@@ -48,20 +49,32 @@ function Tile({file, onClick}: {file: DriveFile; onClick: () => void}) {
 	const [loaded, setLoaded] = useState(false);
 
 	return (
-		<div className="mb-4 break-inside-avoid">
-			{!loaded && (
-				<div className="w-full aspect-[4/3] bg-gray-200 rounded-xl animate-pulse"></div>
+		<div
+			onClick={onClick}
+			className="relative mb-4 break-inside-avoid cursor-pointer group overflow-hidden rounded-xl"
+		>
+			{/* Blur placeholder */}
+			{file.blurDataURL && (
+				<img
+					src={file.blurDataURL}
+					className={`absolute inset-0 w-full h-full object-cover scale-110 blur-xl transition-opacity duration-700 ${
+						loaded ? "opacity-0" : "opacity-100"
+					}`}
+				/>
 			)}
 
+			{/* Main image */}
 			<img
 				src={file.thumb!}
 				alt={file.name}
-				onLoad={() => setLoaded(true)}
-				onClick={onClick}
 				loading="lazy"
-				className={`w-full rounded-xl shadow-sm hover:shadow-lg transition duration-300 cursor-pointer 
-        object-cover ${loaded ? "opacity-100 animate-fadeIn" : "opacity-0"}`}
+				onLoad={() => setLoaded(true)}
+				className={`w-full rounded-xl object-cover transition duration-700
+        ${loaded ? "opacity-100 scale-100" : "opacity-0 scale-105"}`}
 			/>
+
+			{/* Hover overlay */}
+			<div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition duration-300" />
 		</div>
 	);
 }
