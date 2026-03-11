@@ -187,7 +187,7 @@ export default function Lightbox({
 				</div>
 			</div>
 			{/* Navigation Arrows */}
-			<div className="absolute inset-x-4 top-1/2 -translate-y-1/2 flex justify-between pointer-events-none z-[105]">
+			{/* <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 flex justify-between pointer-events-none z-[105]">
 				<button
 					disabled={index === 0}
 					onClick={() => onNavigate(index - 1)}
@@ -214,6 +214,53 @@ export default function Lightbox({
 				>
 					<svg
 						className="w-8 h-8"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+					>
+						<path
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth="2"
+							d="M9 5l7 7-7 7"
+						/>
+					</svg>
+				</button>
+			</div> */}
+
+			<div className="absolute bottom-6 md:top-1/2 md:-translate-y-1/2 inset-x-4 flex justify-between items-center z-[110] pointer-events-none">
+				<button
+					disabled={index === 0}
+					onClick={() => onNavigate(index - 1)}
+					className="p-3 md:p-4 rounded-full bg-white/10 text-white hover:bg-white/20 disabled:opacity-0 transition-all pointer-events-auto backdrop-blur-md"
+				>
+					<svg
+						className="w-6 h-6 md:w-8 md:h-8"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+					>
+						<path
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth="2"
+							d="M15 19l-7-7 7-7"
+						/>
+					</svg>
+				</button>
+
+				{/* Small counter for mobile users */}
+				<span className="md:hidden text-white/60 text-xs font-mono">
+					{index + 1} / {files.length}
+				</span>
+
+				<button
+					disabled={index === files.length - 1}
+					onClick={() => onNavigate(index + 1)}
+					className="p-3 md:p-4 rounded-full bg-white/10 text-white hover:bg-white/20 disabled:opacity-0 transition-all pointer-events-auto backdrop-blur-md"
+				>
+					<svg
+						className="w-6 h-6 md:w-8 md:h-8"
 						fill="none"
 						stroke="currentColor"
 						viewBox="0 0 24 24"

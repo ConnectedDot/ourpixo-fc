@@ -1,4 +1,3 @@
-// components/FolderGrid.tsx
 export default function FolderGrid({
 	folders,
 	onSelect,
@@ -7,16 +6,18 @@ export default function FolderGrid({
 	onSelect: (id: string) => void;
 }) {
 	return (
-		<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 p-4">
+		// Changed to 2 columns on mobile instead of 1 for better use of space
+		<div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-12 p-4 md:p-8">
 			{folders.map(folder => (
 				<div
 					key={folder.id}
 					onClick={() => onSelect(folder.id)}
-					className="group relative cursor-pointer overflow-hidden rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300"
+					className="group relative cursor-pointer overflow-hidden rounded-xl md:rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300"
 				>
-					<div className="aspect-[16/1] bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
+					{/* Aspect ratio changed to be visible on mobile */}
+					<div className="aspect-video sm:aspect-square md:aspect-video bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center group-hover:scale-105 transition-transform duration-500">
 						<svg
-							className="w-12 h-12 text-blue-400 group-hover:text-blue-600 transition-colors"
+							className="w-8 h-8 md:w-12 md:h-12 text-blue-400 group-hover:text-blue-600"
 							fill="none"
 							stroke="currentColor"
 							viewBox="0 0 24 24"
@@ -29,11 +30,11 @@ export default function FolderGrid({
 							/>
 						</svg>
 					</div>
-					<div className="p-4 bg-white">
-						<h3 className="font-semibold text-gray-800 truncate">
+					<div className="p-3 md:p-4 bg-white">
+						<h3 className="font-semibold text-sm md:text-base text-gray-800 truncate">
 							{folder.name}
 						</h3>
-						<p className="text-xs text-gray-500 mt-1 uppercase tracking-wider font-bold">
+						<p className="text-[10px] md:text-xs text-gray-500 mt-0.5 md:mt-1 uppercase tracking-wider font-bold">
 							View Album
 						</p>
 					</div>

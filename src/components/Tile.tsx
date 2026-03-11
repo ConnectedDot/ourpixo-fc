@@ -29,17 +29,19 @@ export default function Tile({
 				src={file.thumb!}
 				alt={file.name}
 				loading="lazy"
-				decoding="async"
 				onLoad={() => setLoaded(true)}
 				className={`w-full object-cover transition duration-500 ${
 					loaded ? "opacity-100 scale-100" : "opacity-0 scale-105"
 				}`}
 			/>
 
-			<div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition" />
+			{/* Always show a slight gradient at the bottom on mobile, full overlay on hover desktop */}
+			<div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300" />
 
-			<div className="absolute bottom-3 left-3 right-3 text-white opacity-0 group-hover:opacity-100 transition">
-				<p className="text-sm font-medium truncate">{file.name}</p>
+			<div className="absolute bottom-2 left-2 right-2 text-white pointer-events-none">
+				<p className="text-[10px] md:text-sm font-medium truncate drop-shadow-md">
+					{file.name}
+				</p>
 			</div>
 		</div>
 	);
