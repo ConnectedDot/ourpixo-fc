@@ -14,6 +14,7 @@ export type DriveFile = {
 export type DriveFolder = { id: string; name: string; icon?: string | null };
 
 export type DrivePayload = {
+  json(): any
   folderId: string;
   folders: DriveFolder[];
   files: DriveFile[];

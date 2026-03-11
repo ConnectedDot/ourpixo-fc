@@ -5,7 +5,7 @@
 			"destination": "/api/$1"
 		},
 		{
-			"source": "/((?!api/|node_modules/|@vite/|@react-refresh|src/|manifest\\.webmanifest|rccg\\.png|favicon\\.ico).*)",
+			"source": "/((?!api/|node_modules/|@vite/|@react-refresh|src/|manifest\\.webmanifest|rccg\\.png|icon\\.svg|favicon\\.ico).*)",
 			"destination": "/"
 		}
 	],
@@ -13,29 +13,11 @@
 		{
 			"source": "/(.*)",
 			"headers": [
-				{
-					"key": "X-Frame-Options",
-					"value": "DENY"
-				},
-				{
-					"key": "X-Content-Type-Options",
-					"value": "nosniff"
-				},
-				{
-					"key": "X-XSS-Protection",
-					"value": "1; mode=block"
-				},
-				{
-					"key": "Referrer-Policy",
-					"value": "strict-origin-when-cross-origin"
-				},
-				{
-					"key": "Permissions-Policy",
-					"value": "geolocation=(), microphone=(), camera=()"
-				},
+				{"key": "X-Frame-Options", "value": "DENY"},
+				{"key": "X-Content-Type-Options", "value": "nosniff"},
 				{
 					"key": "Content-Security-Policy",
-					"value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://cdn.emailjs.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.emailjs.com https://www.google-analytics.com https://analytics.google.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
+					"value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://cdn.emailjs.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.emailjs.com https://vercel.live; frame-src 'self' https://vercel.live; frame-ancestors 'none';"
 				}
 			]
 		}

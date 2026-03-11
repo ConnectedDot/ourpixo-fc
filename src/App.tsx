@@ -297,7 +297,7 @@ import Lightbox from "./components/Lightbox";
 import MasonryGallery from "./components/MasonryGallery";
 import SearchBar from "./components/SearchBar";
 import {createSearch} from "./lib/ai-search";
-import type {DriveFile} from "./lib/drive";
+import {listDrive, type DriveFile} from "./lib/drive";
 
 export default function App() {
 	const [files, setFiles] = useState<DriveFile[]>([]);
@@ -305,7 +305,8 @@ export default function App() {
 	const [active, setActive] = useState<number | null>(null);
 
 	useEffect(() => {
-		fetch("/api/drive/list")
+		// fetch("/api/drive/list")
+		listDrive()
 			.then(r => r.json())
 			.then(data => {
 				setFiles(data.files);
