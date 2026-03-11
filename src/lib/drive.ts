@@ -76,16 +76,16 @@
 // src/lib/drive.ts
 
 export type DriveFile = {
-  id: string;
-  name: string;
-  mimeType: string;
-  thumb?: string | null;
-  viewUrl: string;
-  downloadUrl?: string;
-  webViewLink?: string | null;
-  createdTime?: string | null;
-  blurDataURL?: string;
-};
+  id: string
+  name: string
+  mimeType: string
+  thumb?: string | null
+  viewUrl: string
+  downloadUrl: string
+  webViewLink?: string | null
+  createdTime?: string | null
+  dominantColor?: string
+}
 
 
 export type DriveFolder = { id: string; name: string; icon?: string | null };
