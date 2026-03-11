@@ -11,7 +11,6 @@ export type DriveFile = {
   dominantColor?: string
 }
 
-
 export type DriveFolder = { id: string; name: string; icon?: string | null };
 
 export type DrivePayload = {
