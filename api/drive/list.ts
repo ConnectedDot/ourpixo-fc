@@ -19,7 +19,7 @@ export default async function handler(req: any, res: any) {
     const folderId = sanitizeFolderId(req.query.folderId as string | undefined);
     if (!folderId) return res.status(400).json({ error: "Missing folderId" });
 
-    const pageSize = Math.min(Number(req.query.pageSize || 48), 200);
+    const pageSize = Math.min(Number(req.query.pageSize || 100), 200);
     const pageToken = req.query.pageToken || undefined;
 
     const auth = getAuth();
@@ -48,6 +48,16 @@ export default async function handler(req: any, res: any) {
       icon: (f as any).iconLink || null,
     }));
 
+    let totalCount = 0;
+    if (!pageToken) {
+      const countResp = await drive.files.list({
+        q: fileQuery,
+        fields: "files(id)", // ONLY fetch IDs to keep it extremely fast
+        pageSize: 1000,      // Increase limit to capture the full count in one go
+      });
+      totalCount = countResp.data.files?.length || 0;
+    }
+
 
 
     const files = (filesResp.data.files || []).map((f) => ({
@@ -69,6 +79,7 @@ export default async function handler(req: any, res: any) {
       folderId,
       folders,
       files,
+      totalCount,
       nextPageToken: filesResp.data.nextPageToken || null,
     });
   } catch (err: any) {

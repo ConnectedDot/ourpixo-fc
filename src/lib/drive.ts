@@ -9,11 +9,13 @@ export type DriveFile = {
   webViewLink?: string | null
   createdTime?: string | null
   dominantColor?: string
+  totalCount?: any
 }
 
 export type DriveFolder = { id: string; name: string; icon?: string | null };
 
 export type DrivePayload = {
+  totalCount: number
   json(): any
   folderId: string;
   folders: DriveFolder[];
@@ -24,7 +26,8 @@ export type DrivePayload = {
 export async function listDrive(
   folderId?: string,
   pageToken?: string,
-  pageSize = 48
+  pageSize = 100,
+  totalCount?: number
 ): Promise<DrivePayload> {
 
   const params = new URLSearchParams();
