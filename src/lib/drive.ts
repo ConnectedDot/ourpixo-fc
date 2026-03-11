@@ -32,7 +32,7 @@ export async function listDrive(
   if (pageToken) params.set("pageToken", pageToken);
   params.set("pageSize", String(pageSize));
 
-  const url = `/api/drive/list?${params.toString()}`;
+  const url = `/api/list?${params.toString()}`;
 
   const r = await fetch(url);
   if (!r.ok) throw new Error(`Drive list failed: ${r.status}`);
@@ -41,8 +41,8 @@ export async function listDrive(
 
   // Build proxied thumbnail + full-view URLs
   data.files = data.files.map((f) => {
-    const thumbUrl = `/api/drive/thumb?id=${f.id}&w=350`;
-    const fullUrl = `/api/drive/image?id=${f.id}`;
+    const thumbUrl = `/api/thumb?id=${f.id}&w=350`;
+    const fullUrl = `/api/image?id=${f.id}`;
     return {
       ...f,
       thumb: thumbUrl,

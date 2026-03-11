@@ -304,7 +304,7 @@ export default function App() {
 	const [active, setActive] = useState<number | null>(null);
 
 	useEffect(() => {
-		fetch("/api/drive")
+		fetch("/api")
 			.then(r => r.json())
 			.then(data => {
 				setFiles(data.files);
