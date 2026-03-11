@@ -291,6 +291,7 @@
 // 		</div>
 // 	);
 // }
+
 import {useEffect, useState} from "react";
 import Lightbox from "./components/Lightbox";
 import MasonryGallery from "./components/MasonryGallery";
@@ -304,7 +305,7 @@ export default function App() {
 	const [active, setActive] = useState<number | null>(null);
 
 	useEffect(() => {
-		fetch("/api")
+		fetch("/api/drive/list")
 			.then(r => r.json())
 			.then(data => {
 				setFiles(data.files);

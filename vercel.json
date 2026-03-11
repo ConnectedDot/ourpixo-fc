@@ -1,5 +1,14 @@
 {
-	"rewrites": [{"source": "/(.*)", "destination": "/"}],
+	"rewrites": [
+		{
+			"source": "/api/(.*)",
+			"destination": "/api/$1"
+		},
+		{
+			"source": "/((?!api/|node_modules/|@vite/|@react-refresh|src/|manifest\\.webmanifest|rccg\\.png|favicon\\.ico).*)",
+			"destination": "/"
+		}
+	],
 	"headers": [
 		{
 			"source": "/(.*)",
@@ -26,7 +35,7 @@
 				},
 				{
 					"key": "Content-Security-Policy",
-					"value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.emailjs.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.emailjs.com https://www.google-analytics.com https://analytics.google.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
+					"value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://cdn.emailjs.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.emailjs.com https://www.google-analytics.com https://analytics.google.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
 				}
 			]
 		}
