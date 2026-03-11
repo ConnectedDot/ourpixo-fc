@@ -12,32 +12,25 @@ export default function GalleryImage({
 
 	return (
 		<div
-			className="relative overflow-hidden rounded-xl cursor-pointer group"
 			onClick={onClick}
-			style={{
-				background: file.dominantColor || "#e5e7eb",
-			}}
+			className="relative overflow-hidden rounded-xl cursor-pointer group bg-gray-100"
+			style={{aspectRatio: "auto"}}
 		>
-			{/* Blur placeholder */}
-
 			<img
 				src={file.thumb}
-				className={`w-full object-cover transition duration-500 ${
+				alt={file.name}
+				onLoad={() => setLoaded(true)}
+				// This ensures that if the image is cached, it still shows
+				className={`w-full transition-all duration-700 ease-in-out ${
 					loaded ?
 						"opacity-100 blur-0 scale-100"
-					:	"opacity-0 blur-xl scale-105"
+					:	"opacity-0 blur-lg scale-105"
 				}`}
-				onLoad={() => setLoaded(true)}
 				loading="lazy"
-				decoding="async"
 			/>
-
-			{/* Hover overlay */}
-
-			<div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition" />
-
-			<div className="absolute bottom-3 left-3 right-3 text-white opacity-0 group-hover:opacity-100 transition">
-				<p className="text-sm font-medium truncate">{file.name}</p>
+			{/* Hover State */}
+			<div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
+				<p className="text-white text-xs truncate">{file.name}</p>
 			</div>
 		</div>
 	);

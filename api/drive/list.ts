@@ -48,15 +48,25 @@ export default async function handler(req: any, res: any) {
       icon: (f as any).iconLink || null,
     }));
 
+    // const files = (filesResp.data.files || []).map((f) => ({
+    //   id: f.id!,
+    //   name: f.name!,
+    //   mimeType: f.mimeType!,
+    //   thumb: f.thumbnailLink || null,
+    //   viewUrl: `https://drive.google.com/uc?id=${f.id}`, // overridden in lib/drive.ts
+    //   downloadUrl: `https://drive.google.com/uc?export=download&id=${f.id}`,
+    //   webViewLink: f.webViewLink || null,
+    //   createdTime: (f as any).createdTime || null,
+    // }));
+
     const files = (filesResp.data.files || []).map((f) => ({
       id: f.id!,
       name: f.name!,
       mimeType: f.mimeType!,
-      thumb: f.thumbnailLink || null,
-      viewUrl: `https://drive.google.com/uc?id=${f.id}`, // overridden in lib/drive.ts
-      downloadUrl: `https://drive.google.com/uc?export=download&id=${f.id}`,
-      webViewLink: f.webViewLink || null,
-      createdTime: (f as any).createdTime || null,
+      // Change =s220 to =s600 for a high-quality native Google thumb
+      thumb: f.thumbnailLink ? f.thumbnailLink.replace(/=s220$/, "=s600") : null,
+      viewUrl: `/api/drive/image?id=${f.id}`,
+      downloadUrl: f.webViewLink,
     }));
 
     res.setHeader(

@@ -41,7 +41,7 @@ export async function listDrive(
 
   // Build proxied thumbnail + full-view URLs
   data.files = data.files.map((f) => {
-    const thumbUrl = `/api/drive/thumb?id=${f.id}&w=350`;
+    const thumbUrl = `/api/drive/thumb?id=${f.id}&w=400`;
     const fullUrl = `/api/drive/image?id=${f.id}`;
     return {
       ...f,
