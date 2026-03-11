@@ -1,5 +1,7 @@
-import Masonry from "react-responsive-masonry";
-import ResponsiveMasonry from "react-responsive-masonry";
+// import Masonry from "react-responsive-masonry";
+// import ResponsiveMasonry from "react-responsive-masonry";
+
+import Masonry, {ResponsiveMasonry} from "react-responsive-masonry";
 import type {DriveFile} from "../lib/drive";
 import GalleryImage from "./GalleryImage";
 
