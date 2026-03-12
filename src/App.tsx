@@ -6,11 +6,14 @@ import {listDrive, type DriveFile, type DriveFolder} from "./lib/drive";
 import FolderGrid from "./components/FolderCard";
 import Hero from "./components/HeroSection";
 
+type AnyObj = Record<string, unknown>;
+
 export default function App() {
 	const [folders, setFolders] = useState<DriveFolder[]>([]);
 	const [files, setFiles] = useState<DriveFile[]>([]);
 	const [filtered, setFiltered] = useState<DriveFile[]>([]);
-	const [datas, setData] = useState([]);
+	// const [datas, setData] = useState([]);
+	const [datas, setData] = useState<AnyObj | null>(null);
 	const [active, setActive] = useState<number | null>(null);
 	const [currentFolderId, setCurrentFolderId] = useState<string | undefined>();
 	const [loading, setLoading] = useState(false);
@@ -87,7 +90,8 @@ export default function App() {
 								</button>
 
 								<span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">
-									{datas?.totalCount} Photos
+									{/* {datas?.totalCount} Photos */}
+									{(datas as any)?.totalCount ?? files.length} Photos
 								</span>
 
 								{/* <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-100 px-2 py-1 rounded-md">
