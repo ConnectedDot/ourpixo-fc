@@ -19,7 +19,7 @@ export default async function handler(req: any, res: any) {
     const folderId = sanitizeFolderId(req.query.folderId as string | undefined);
     if (!folderId) return res.status(400).json({ error: "Missing folderId" });
 
-    const pageSize = Math.min(Number(req.query.pageSize || 100), 200);
+    const pageSize = Math.min(Number(req.query.pageSize || 100), 1000); //  changed 200 to 1000 in here also
     const pageToken = req.query.pageToken || undefined;
 
     const auth = getAuth();
