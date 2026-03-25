@@ -26,7 +26,7 @@ export type DrivePayload = {
 export async function listDrive(
   folderId?: string,
   pageToken?: string,
-  pageSize = 100,
+  pageSize = 600, //Checking if we have overcome the 443 limit in the 443 Pictures in Feast of Praise 2.0
   totalCount?: number
 ): Promise<DrivePayload> {
 
