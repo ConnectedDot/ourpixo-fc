@@ -4,6 +4,7 @@ export type DriveFile = {
   name: string
   mimeType: string
   thumb?: string | null
+  highResThumb?: string | null
   viewUrl: string
   downloadUrl: string
   webViewLink?: string | null

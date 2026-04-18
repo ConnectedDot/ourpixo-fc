@@ -111,30 +111,37 @@ export default function Lightbox({
 			</button>
 
 			{/* Main Image Container */}
-			<div className="relative z-10 w-full max-w-5xl h-full flex flex-col items-center justify-center p-4 pointer-events-none">
+			<div className="relative z-10 w-full max-w-5xl h-full flex flex-col items-center justify-center p-2 md:p-4 pointer-events-none">
 				<div className="relative flex items-center justify-center pointer-events-auto">
 					{!highResLoaded && (
-						<div className="absolute inset-0 flex items-center justify-center">
-							<div className="w-10 h-10 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
+						<div className="absolute inset-0 flex items-center justify-center z-20">
+							<div className="w-8 h-8 md:w-10 md:h-10 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
 						</div>
 					)}
+					
+					{/* Progressive Loading: Show highResThumb (Google CDN) first, then swap to viewUrl (Proxy) */}
+					<img
+						src={(f as any).highResThumb || f.thumb}
+						className={`max-h-[65vh] md:max-h-[80vh] w-auto object-contain rounded-lg md:rounded-xl shadow-2xl transition-opacity duration-700 ${highResLoaded ? "opacity-0 absolute" : "opacity-100"}`}
+					/>
+
 					<motion.img
 						key={f.id}
 						src={f.viewUrl}
 						onLoad={() => setHighResLoaded(true)}
-						className={`max-h-[75vh] md:max-h-[80vh] w-auto object-contain rounded-xl shadow-2xl transition-opacity duration-500 ${highResLoaded ? "opacity-100" : "opacity-0"}`}
+						className={`max-h-[65vh] md:max-h-[80vh] w-auto object-contain rounded-lg md:rounded-xl shadow-2xl transition-opacity duration-700 ${highResLoaded ? "opacity-100" : "opacity-0"}`}
 					/>
 				</div>
 
 				{/* Responsive Controls */}
-				<div className="mt-6 text-center text-white pointer-events-auto w-full max-w-sm px-4">
-					<h2 className="text-lg font-medium mb-4 truncate">{f.name}</h2>
+				<div className="mt-4 md:mt-6 text-center text-white pointer-events-auto w-full max-w-xs md:max-w-sm px-4">
+					<h2 className="text-sm md:text-lg font-medium mb-4 truncate italic opacity-80">{f.name}</h2>
 
-					<div className="flex flex-col sm:flex-row gap-3">
+					<div className="flex flex-col sm:flex-row gap-2 md:gap-3">
 						<button
 							onClick={handleDownload}
 							disabled={isDownloading}
-							className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold transition-all shadow-lg ${
+							className={`flex-1 flex items-center justify-center gap-2 px-6 py-2.5 md:py-3 rounded-full text-sm md:text-base font-bold transition-all shadow-lg ${
 								isDownloading ?
 									"bg-gray-600 cursor-not-allowed"
 								:	"bg-white text-black hover:bg-blue-600 hover:text-white"
@@ -143,11 +150,11 @@ export default function Lightbox({
 							{isDownloading ?
 								<>
 									<div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-									Processing...
+									<span className="text-xs">Processing...</span>
 								</>
 							:	<>
 									<svg
-										className="w-5 h-5"
+										className="w-4 h-4 md:w-5 md:h-5"
 										fill="none"
 										stroke="currentColor"
 										viewBox="0 0 24 24"
@@ -166,10 +173,10 @@ export default function Lightbox({
 
 						<button
 							onClick={handleShare}
-							className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-white/10 border border-white/20 backdrop-blur-md rounded-full hover:bg-white/20 transition-all text-white font-medium"
+							className="flex-1 flex items-center justify-center gap-2 px-6 py-2.5 md:py-3 bg-white/10 border border-white/20 backdrop-blur-md rounded-full hover:bg-white/20 transition-all text-white text-sm md:text-base font-medium"
 						>
 							<svg
-								className="w-5 h-5"
+								className="w-4 h-4 md:w-5 md:h-5"
 								fill="none"
 								stroke="currentColor"
 								viewBox="0 0 24 24"
@@ -186,6 +193,7 @@ export default function Lightbox({
 					</div>
 				</div>
 			</div>
+
 			{/* Navigation Arrows */}
 			{/* <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 flex justify-between pointer-events-none z-[105]">
 				<button

@@ -56,65 +56,78 @@ export default function App() {
 						</p>
 					</div>
 				:	<div className="animate-in fade-in duration-700">
-						{/* 1. Show folders only if we aren't "inside" a folder or if searching */}
-						{!currentFolderId && folders.length > 0 && (
-							<div className="pt-8">
-								<h2 className="px-4 text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-2">
-									Albums
-								</h2>
+						{/* 1. Folders Section */}
+						{folders.length > 0 && (
+							<section className="pt-10">
+								<div className="flex items-center justify-between mb-6 px-4">
+									<h2 className="text-[10px] font-black text-blue-600 uppercase tracking-[0.3em]">
+										{currentFolderId ? "Sub-Albums" : "Recent Albums"}
+									</h2>
+									<div className="h-px flex-1 bg-blue-100/50 mx-6 hidden sm:block"></div>
+								</div>
 								<FolderGrid folders={folders} onSelect={setCurrentFolderId} />
-							</div>
+							</section>
 						)}
 
 						{/* 2. Navigation bar for when inside a folder */}
 						{currentFolderId && (
-							<div className="flex items-center justify-between pt-6 mb-8 px-2">
+							<div className="flex items-center justify-between pt-4 mb-6 md:mb-10 px-2 md:px-4">
 								<button
 									onClick={() => setCurrentFolderId(undefined)}
-									className="flex items-center gap-2 py-2 px-4 -ml-4 rounded-full text-xs font-black text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-all"
+									className="group flex items-center gap-2 md:gap-3 py-2 md:py-2.5 px-4 md:px-6 rounded-full glass hover:bg-white transition-all duration-300 shadow-sm"
 								>
-									<svg
-										className="w-4 h-4"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											d="M15 19l-7-7 7-7"
-											strokeWidth="3"
-											strokeLinecap="round"
-											strokeLinejoin="round"
-										/>
-									</svg>
-									BACK TO ALBUMS
+									<div className="w-4 h-4 md:w-5 md:h-5 flex items-center justify-center bg-blue-600 rounded-full text-white group-hover:scale-110 transition-transform">
+										<svg
+											className="w-2.5 h-2.5 md:w-3.5 md:h-3.5"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+										>
+											<path
+												d="M15 19l-7-7 7-7"
+												strokeWidth="3"
+												strokeLinecap="round"
+												strokeLinejoin="round"
+											/>
+										</svg>
+									</div>
+									<span className="text-[9px] md:text-[11px] font-bold text-gray-700 uppercase tracking-widest">
+										Gallery
+									</span>
 								</button>
 
-								<span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">
-									{/* {datas?.totalCount} Photos */}
-									{(datas as any)?.totalCount ?? files.length} Photos
-								</span>
-
-								{/* <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-100 px-2 py-1 rounded-md">
-									{datas?.totalCount} {datas?.totalCount === 1 ? "Photo" : "Photos"}
-								</span> */}
+								<div className="flex flex-col items-end">
+									<span className="text-[12px] md:text-[14px] font-black text-slate-800 tracking-tight">
+										Viewing Album
+									</span>
+									<span className="text-[8px] md:text-[10px] font-medium text-blue-500 uppercase tracking-widest">
+										{(datas as any)?.totalCount ?? files.length} captures
+									</span>
+								</div>
 							</div>
 						)}
 
+
 						{/* 3. The Masonry Grid */}
-						<div
-							className={!currentFolderId && folders.length > 0 ? "mt-4" : ""}
-						>
+						<div className="mt-8">
 							{filtered.length > 0 ?
 								<MasonryGallery files={filtered} onOpen={setActive} />
-							:	!loading && (
-									<div className="text-center py-20">
-										<p className="text-gray-400 font-medium">
-											No photos found in this album.
+							:	!loading && folders.length === 0 && (
+									<div className="flex flex-col items-center justify-center py-32 text-center">
+										<div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-6">
+											<svg className="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+											</svg>
+										</div>
+										<h3 className="text-slate-900 font-bold mb-1">No media found</h3>
+										<p className="text-slate-400 text-sm max-w-xs">
+											We couldn't find any photos in this specific album yet.
 										</p>
 									</div>
 								)
 							}
 						</div>
+
 					</div>
 				}
 			</main>

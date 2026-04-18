@@ -12,17 +12,19 @@ export default function MasonryGallery({
 	files: DriveFile[];
 	onOpen: (i: number) => void;
 }) {
+	const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+
 	return (
 		<ResponsiveMasonry
 			columnsCountBreakPoints={{
-				350: 1,
+				300: 2, // 2 columns on mobile by default for better scanability
 				640: 2,
 				900: 3,
 				1200: 4,
 				1600: 5,
 			}}
 		>
-			<Masonry gutter="16px">
+			<Masonry gutter={isMobile ? "8px" : "16px"}>
 				{files.map((file, index) => (
 					<GalleryImage
 						key={file.id}

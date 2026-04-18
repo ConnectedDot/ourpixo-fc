@@ -66,9 +66,11 @@ export default async function handler(req: any, res: any) {
       mimeType: f.mimeType!,
       // Change =s220 to =s600 for a high-quality native Google thumb
       thumb: f.thumbnailLink ? f.thumbnailLink.replace(/=s220$/, "=s600") : null,
+      highResThumb: f.thumbnailLink ? f.thumbnailLink.replace(/=s220$/, "=s2000") : null,
       viewUrl: `/api/drive/image?id=${f.id}`,
       downloadUrl: f.webViewLink,
     }));
+
 
     res.setHeader(
       "Cache-Control",
