@@ -17,14 +17,14 @@ export default function MasonryGallery({
 	return (
 		<ResponsiveMasonry
 			columnsCountBreakPoints={{
-				300: 2, // 2 columns on mobile by default for better scanability
+				300: 2,
 				640: 2,
 				900: 3,
 				1200: 4,
 				1600: 5,
 			}}
 		>
-			<Masonry gutter={isMobile ? "8px" : "16px"}>
+			<Masonry gutter={isMobile ? "10px" : "18px"}>
 				{files.map((file, index) => (
 					<GalleryImage
 						key={file.id}

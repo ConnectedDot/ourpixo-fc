@@ -1,5 +1,5 @@
-import {useEffect, useRef, useState} from "react";
-import {motion, AnimatePresence} from "framer-motion";
+import {useEffect, useState} from "react";
+import {AnimatePresence, motion} from "framer-motion";
 import type {DriveFile} from "../lib/drive";
 
 export default function Lightbox({
@@ -16,12 +16,11 @@ export default function Lightbox({
 	const f = files[index];
 	const [highResLoaded, setHighResLoaded] = useState(false);
 	const [showToast, setShowToast] = useState(false);
-	const [isDownloading, setIsDownloading] = useState(false); // New state
+	const [isDownloading, setIsDownloading] = useState(false);
 
-	// Reset loading state whenever the index (image) changes
 	useEffect(() => {
 		setHighResLoaded(false);
-		setIsDownloading(false); // Reset on image change
+		setIsDownloading(false);
 	}, [index]);
 
 	useEffect(() => {
@@ -31,12 +30,12 @@ export default function Lightbox({
 				onNavigate(Math.min(files.length - 1, index + 1));
 			if (e.key === "ArrowLeft") onNavigate(Math.max(0, index - 1));
 		}
+
 		window.addEventListener("keydown", onKey);
 		return () => window.removeEventListener("keydown", onKey);
 	}, [index, files, onClose, onNavigate]);
 
 	const handleShare = async () => {
-		// Crucial: Use your Vercel proxy URL, NOT the google drive URL
 		const shareUrl = `${window.location.origin}/api/drive/image?id=${f.id}`;
 
 		if (navigator.share) {
@@ -57,11 +56,9 @@ export default function Lightbox({
 
 		setIsDownloading(true);
 		try {
-			// Trigger the download via the API
 			const response = await fetch(`${f.viewUrl}&download=true`);
 			if (!response.ok) throw new Error("Download failed");
 
-			// Convert response to a blob and trigger a manual download
 			const blob = await response.blob();
 			const url = window.URL.createObjectURL(blob);
 			const a = document.createElement("a");
@@ -80,91 +77,71 @@ export default function Lightbox({
 	};
 
 	return (
-		<div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md">
-			{/* Background Close Layer: Use a separate div for "click outside" to avoid event bubbling issues */}
+		<div className="fixed inset-0 z-[100] flex items-center justify-center bg-stone-950/96 backdrop-blur-md">
 			<div className="absolute inset-0" onClick={onClose} />
 
-			{/* Blurred Background (The "Instant" feel) */}
 			<img
 				src={f.thumb || ""}
-				className="absolute inset-0 w-full h-full object-cover opacity-30 blur-3xl pointer-events-none"
+				className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-25 blur-3xl"
 				alt=""
 			/>
 
 			<button
-				className="absolute top-6 right-6 z-[110] text-white/70 hover:text-white p-3 bg-white/10 rounded-full transition-all"
+				className="absolute right-4 top-4 z-[110] rounded-full bg-white/10 p-3 text-white/75 backdrop-blur-md transition-all hover:bg-white/15 hover:text-white md:right-6 md:top-6"
 				onClick={onClose}
 			>
-				<svg
-					className="w-6 h-6"
-					fill="none"
-					stroke="currentColor"
-					viewBox="0 0 24 24"
-				>
-					<path
-						strokeLinecap="round"
-						strokeLinejoin="round"
-						strokeWidth="2"
-						d="M6 18L18 6M6 6l12 12"
-					/>
+				<svg className="h-5 w-5 md:h-6 md:w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
 				</svg>
 			</button>
 
-			{/* Main Image Container */}
-			<div className="relative z-10 w-full max-w-5xl h-full flex flex-col items-center justify-center p-2 md:p-4 pointer-events-none">
-				<div className="relative flex items-center justify-center pointer-events-auto">
+			<div className="pointer-events-none relative z-10 flex h-full w-full max-w-6xl flex-col items-center justify-center p-3 md:p-5">
+				<div className="pointer-events-auto relative flex items-center justify-center">
 					{!highResLoaded && (
-						<div className="absolute inset-0 flex items-center justify-center z-20">
-							<div className="w-8 h-8 md:w-10 md:h-10 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
+						<div className="absolute inset-0 z-20 flex items-center justify-center">
+							<div className="h-9 w-9 animate-spin rounded-full border-2 border-white/30 border-t-amber-200 md:h-11 md:w-11"></div>
 						</div>
 					)}
-					
-					{/* Progressive Loading: Show highResThumb (Google CDN) first, then swap to viewUrl (Proxy) */}
+
 					<img
 						src={(f as any).highResThumb || f.thumb}
-						className={`max-h-[65vh] md:max-h-[80vh] w-auto object-contain rounded-lg md:rounded-xl shadow-2xl transition-opacity duration-700 ${highResLoaded ? "opacity-0 absolute" : "opacity-100"}`}
+						alt=""
+						className={`max-h-[64vh] w-auto rounded-2xl object-contain shadow-2xl transition-opacity duration-700 md:max-h-[78vh] ${highResLoaded ? "absolute opacity-0" : "opacity-100"}`}
 					/>
 
 					<motion.img
 						key={f.id}
 						src={f.viewUrl}
+						alt={f.name}
 						onLoad={() => setHighResLoaded(true)}
-						className={`max-h-[65vh] md:max-h-[80vh] w-auto object-contain rounded-lg md:rounded-xl shadow-2xl transition-opacity duration-700 ${highResLoaded ? "opacity-100" : "opacity-0"}`}
+						initial={{scale: 0.98}}
+						animate={{scale: 1}}
+						transition={{duration: 0.45, ease: [0.22, 1, 0.36, 1]}}
+						className={`max-h-[64vh] w-auto rounded-2xl object-contain shadow-2xl transition-opacity duration-700 md:max-h-[78vh] ${highResLoaded ? "opacity-100" : "opacity-0"}`}
 					/>
 				</div>
 
-				{/* Responsive Controls */}
-				<div className="mt-4 md:mt-6 text-center text-white pointer-events-auto w-full max-w-xs md:max-w-sm px-4">
-					<h2 className="text-sm md:text-lg font-medium mb-4 truncate italic opacity-80">{f.name}</h2>
+				<div className="pointer-events-auto mt-4 w-full max-w-sm px-2 text-center text-white md:mt-6">
+					<h2 className="mb-4 truncate text-sm font-medium text-white/80 md:text-base">{f.name}</h2>
 
-					<div className="flex flex-col sm:flex-row gap-2 md:gap-3">
+					<div className="flex gap-2 md:gap-3">
 						<button
 							onClick={handleDownload}
 							disabled={isDownloading}
-							className={`flex-1 flex items-center justify-center gap-2 px-6 py-2.5 md:py-3 rounded-full text-sm md:text-base font-bold transition-all shadow-lg ${
+							className={`flex h-12 flex-1 items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold shadow-lg transition-all ${
 								isDownloading ?
-									"bg-gray-600 cursor-not-allowed"
-								:	"bg-white text-black hover:bg-blue-600 hover:text-white"
+									"cursor-not-allowed bg-white/20 text-white/70"
+								:	"bg-white text-stone-950 hover:bg-amber-200"
 							}`}
 						>
 							{isDownloading ?
 								<>
-									<div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+									<div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></div>
 									<span className="text-xs">Processing...</span>
 								</>
 							:	<>
-									<svg
-										className="w-4 h-4 md:w-5 md:h-5"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											strokeWidth="2"
-											d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-										/>
+									<svg className="h-4 w-4 md:h-5 md:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
 									</svg>
 									Download
 								</>
@@ -173,20 +150,10 @@ export default function Lightbox({
 
 						<button
 							onClick={handleShare}
-							className="flex-1 flex items-center justify-center gap-2 px-6 py-2.5 md:py-3 bg-white/10 border border-white/20 backdrop-blur-md rounded-full hover:bg-white/20 transition-all text-white text-sm md:text-base font-medium"
+							className="flex h-12 flex-1 items-center justify-center gap-2 rounded-full border border-white/15 bg-white/10 px-5 text-sm font-medium text-white backdrop-blur-md transition-all hover:bg-white/20"
 						>
-							<svg
-								className="w-4 h-4 md:w-5 md:h-5"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth="2"
-									d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 100-2.684 3 3 0 000 2.684zm0 12.684a3 3 0 100-2.684 3 3 0 000 2.684z"
-								/>
+							<svg className="h-4 w-4 md:h-5 md:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 100-2.684 3 3 0 000 2.684zm0 12.684a3 3 0 100-2.684 3 3 0 000 2.684z" />
 							</svg>
 							Share
 						</button>
@@ -194,105 +161,41 @@ export default function Lightbox({
 				</div>
 			</div>
 
-			{/* Navigation Arrows */}
-			{/* <div className="absolute inset-x-4 top-1/2 -translate-y-1/2 flex justify-between pointer-events-none z-[105]">
+			<div className="pointer-events-none absolute inset-x-4 bottom-6 z-[110] flex items-center justify-between md:top-1/2 md:-translate-y-1/2">
 				<button
 					disabled={index === 0}
 					onClick={() => onNavigate(index - 1)}
-					className="p-4 rounded-full bg-white/5 text-white hover:bg-white/20 disabled:opacity-0 transition-all pointer-events-auto"
+					className="pointer-events-auto rounded-full bg-white/10 p-3 text-white backdrop-blur-md transition-all hover:bg-white/20 disabled:opacity-0 md:p-4"
 				>
-					<svg
-						className="w-8 h-8"
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-					>
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth="2"
-							d="M15 19l-7-7 7-7"
-						/>
-					</svg>
-				</button>
-				<button
-					disabled={index === files.length - 1}
-					onClick={() => onNavigate(index + 1)}
-					className="p-4 rounded-full bg-white/5 text-white hover:bg-white/20 disabled:opacity-0 transition-all pointer-events-auto"
-				>
-					<svg
-						className="w-8 h-8"
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-					>
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth="2"
-							d="M9 5l7 7-7 7"
-						/>
-					</svg>
-				</button>
-			</div> */}
-
-			<div className="absolute bottom-6 md:top-1/2 md:-translate-y-1/2 inset-x-4 flex justify-between items-center z-[110] pointer-events-none">
-				<button
-					disabled={index === 0}
-					onClick={() => onNavigate(index - 1)}
-					className="p-3 md:p-4 rounded-full bg-white/10 text-white hover:bg-white/20 disabled:opacity-0 transition-all pointer-events-auto backdrop-blur-md"
-				>
-					<svg
-						className="w-6 h-6 md:w-8 md:h-8"
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-					>
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth="2"
-							d="M15 19l-7-7 7-7"
-						/>
+					<svg className="h-6 w-6 md:h-8 md:w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
 					</svg>
 				</button>
 
-				{/* Small counter for mobile users */}
-				<span className="md:hidden text-white/60 text-xs font-mono">
+				<span className="font-mono text-xs text-white/60 md:hidden">
 					{index + 1} / {files.length}
 				</span>
 
 				<button
 					disabled={index === files.length - 1}
 					onClick={() => onNavigate(index + 1)}
-					className="p-3 md:p-4 rounded-full bg-white/10 text-white hover:bg-white/20 disabled:opacity-0 transition-all pointer-events-auto backdrop-blur-md"
+					className="pointer-events-auto rounded-full bg-white/10 p-3 text-white backdrop-blur-md transition-all hover:bg-white/20 disabled:opacity-0 md:p-4"
 				>
-					<svg
-						className="w-6 h-6 md:w-8 md:h-8"
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-					>
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth="2"
-							d="M9 5l7 7-7 7"
-						/>
+					<svg className="h-6 w-6 md:h-8 md:w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
 					</svg>
 				</button>
 			</div>
 
-			{/* Share Toast Notification */}
 			<AnimatePresence>
 				{showToast && (
 					<motion.div
 						initial={{opacity: 0, y: 50}}
 						animate={{opacity: 1, y: 0}}
 						exit={{opacity: 0, y: 20}}
-						className="fixed bottom-10 left-1/2 -translate-x-1/2 px-6 py-3 bg-blue-600 text-white rounded-full shadow-2xl font-medium z-[200]"
+						className="fixed bottom-10 left-1/2 z-[200] -translate-x-1/2 rounded-full bg-white px-6 py-3 font-medium text-stone-950 shadow-2xl"
 					>
-						Link copied to clipboard! 🚀
+						Link copied to clipboard.
 					</motion.div>
 				)}
 			</AnimatePresence>
