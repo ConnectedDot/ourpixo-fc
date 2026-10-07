@@ -1,16 +1,9 @@
 // api/drive/thumb.ts
 import { google } from "googleapis";
+import { getDriveAuth } from "./auth";
 import Sharp from "sharp";
 
-function getAuth() {
-    const email = process.env.GOOGLE_CLIENT_EMAIL!;
-    let key = process.env.GOOGLE_PRIVATE_KEY!;
-    key = key.replace(/\\n/g, "\n");
 
-    return new google.auth.JWT(email, undefined, key, [
-        "https://www.googleapis.com/auth/drive.readonly",
-    ]);
-}
 
 
 export default async function handler(req: any, res: any) {
@@ -20,7 +13,7 @@ export default async function handler(req: any, res: any) {
 
         if (!id) return res.status(400).send("Missing id");
 
-        const auth = getAuth();
+        const auth = getDriveAuth();
         const drive = google.drive({ version: "v3", auth });
 
         // Fetch raw file stream
@@ -30,7 +23,7 @@ export default async function handler(req: any, res: any) {
         );
 
         res.setHeader("Content-Type", "image/jpeg");
-        res.setHeader("Cache-Control", "public, s-maxage=86400, max-age=3600");
+        res.setHeader("Cache-Control", "public, max-age=86400, s-maxage=604800, stale-while-revalidate=2592000");
 
         // Pipe through Sharp to optimize & resize
         const transformer = Sharp()

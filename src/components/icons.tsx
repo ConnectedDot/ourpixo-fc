@@ -1,0 +1,14 @@
+import type { SVGProps } from 'react';
+const I = ({children, ...props}: SVGProps<SVGSVGElement>) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>{children}</svg>;
+export const SearchIcon = (p: SVGProps<SVGSVGElement>) => <I {...p}><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></I>;
+export const FolderIcon = (p: SVGProps<SVGSVGElement>) => <I {...p}><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H10l2 2h6.5A2.5 2.5 0 0 1 21 9.5v7A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5z"/></I>;
+export const ShareIcon = (p: SVGProps<SVGSVGElement>) => <I {...p}><circle cx="18" cy="5" r="2"/><circle cx="6" cy="12" r="2"/><circle cx="18" cy="19" r="2"/><path d="m8 11 8-5M8 13l8 5"/></I>;
+export const ArrowLeftIcon = (p: SVGProps<SVGSVGElement>) => <I {...p}><path d="m15 18-6-6 6-6"/></I>;
+export const ArrowRightIcon = (p: SVGProps<SVGSVGElement>) => <I {...p}><path d="m9 18 6-6-6-6"/></I>;
+export const XIcon = (p: SVGProps<SVGSVGElement>) => <I {...p}><path d="M6 6l12 12M18 6 6 18"/></I>;
+export const DownloadIcon = (p: SVGProps<SVGSVGElement>) => <I {...p}><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 20h14"/></I>;
+export const HomeIcon = (p: SVGProps<SVGSVGElement>) => <I {...p}><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10M9 20v-6h6v6"/></I>;
+export const InfoIcon = (p: SVGProps<SVGSVGElement>) => <I {...p}><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></I>;
+export const MoreIcon = (p: SVGProps<SVGSVGElement>) => <I {...p}><circle cx="5" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="19" cy="12" r="1" fill="currentColor"/></I>;
+export const SunIcon = (p: SVGProps<SVGSVGElement>) => <I {...p}><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/></I>;
+export const MoonIcon = (p: SVGProps<SVGSVGElement>) => <I {...p}><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.7 8.7 0 1 0 20.5 14.2Z"/></I>;

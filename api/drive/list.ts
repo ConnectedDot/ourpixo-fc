@@ -1,14 +1,8 @@
 // api/drive/list.ts
 import { google } from "googleapis";
+import { getDriveAuth } from "./auth";
 
-function getAuth() {
-  const email = process.env.GOOGLE_CLIENT_EMAIL!;
-  let key = process.env.GOOGLE_PRIVATE_KEY!;
-  key = key.replace(/\\n/g, "\n");
-  return new google.auth.JWT(email, undefined, key, [
-    "https://www.googleapis.com/auth/drive.readonly",
-  ]);
-}
+
 
 function sanitizeFolderId(id?: string) {
   return (id || process.env.DRIVE_ROOT_FOLDER_ID || "").trim();
@@ -22,7 +16,7 @@ export default async function handler(req: any, res: any) {
     const pageSize = Math.min(Number(req.query.pageSize || 100), 1000); //  changed 200 to 1000 in here also
     const pageToken = req.query.pageToken || undefined;
 
-    const auth = getAuth();
+    const auth = getDriveAuth();
     const drive = google.drive({ version: "v3", auth });
 
     const folderQuery = `'${folderId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`;

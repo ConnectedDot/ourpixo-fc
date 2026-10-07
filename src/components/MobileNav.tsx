@@ -1,0 +1,2 @@
+import {FolderIcon,HomeIcon,MoreIcon,SearchIcon} from './icons';
+export default function MobileNav({onHome,onSearch,onAlbums,onMore}:{onHome:()=>void;onSearch:()=>void;onAlbums:()=>void;onMore:()=>void}){return <nav className="mobile-nav"><button onClick={onHome} className="active"><HomeIcon/><span>Gallery</span></button><button onClick={onAlbums}><FolderIcon/><span>Albums</span></button><button data-tour="search" onClick={onSearch}><SearchIcon/><span>Search</span></button><button onClick={onMore}><MoreIcon/><span>More</span></button></nav>}
