@@ -1,6 +1,6 @@
 // api/drive/thumb.ts
 import { google } from "googleapis";
-import { getDriveAuth } from "./auth";
+import { getDriveAuth } from "./auth.js";
 import Sharp from "sharp";
 
 

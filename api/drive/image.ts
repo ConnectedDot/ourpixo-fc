@@ -1,6 +1,6 @@
 // api/drive/image.ts
 import { google } from "googleapis";
-import { getDriveAuth } from "./auth";
+import { getDriveAuth } from "./auth.js";
 
 
 
