@@ -1,26 +1,387 @@
-import {useEffect,useMemo,useRef,useState} from 'react'; import {AnimatePresence,motion} from 'framer-motion'; import Hero from './components/HeroSection'; import FolderGrid from './components/FolderCard'; import MasonryGallery from './components/MasonryGallery'; import Lightbox from './components/Lightbox'; import MobileNav from './components/MobileNav'; import BottomSheet from './components/BottomSheet'; import OnboardingTour from './components/OnboardingTour'; import Toast from './components/Toast'; import {ArrowLeftIcon,HomeIcon,InfoIcon,SearchIcon,ShareIcon} from './components/icons'; import {createSearch} from './lib/ai-search'; import {listDrive,type DriveFile,type DriveFolder} from './lib/drive'; import {folderShareUrl,readFolderPath,writeFolderPath,type FolderCrumb} from './lib/navigation';
-type Sheet='search'|'albums'|'more'|null;
-export default function App(){
- const[folders,setFolders]=useState<DriveFolder[]>([]),[files,setFiles]=useState<DriveFile[]>([]),[filtered,setFiltered]=useState<DriveFile[]>([]),[folderResults,setFolderResults]=useState<DriveFolder[]>([]),[query,setQuery]=useState('');const[path,setPath]=useState<FolderCrumb[]>(()=>readFolderPath());const[loading,setLoading]=useState(true),[error,setError]=useState<string|null>(null),[active,setActive]=useState<number|null>(null),[sheet,setSheet]=useState<Sheet>(null),[toast,setToast]=useState<string|null>(null),[total,setTotal]=useState(0),[dark,setDark]=useState(()=>localStorage.getItem('ourpixo-theme')!=='light');const toastTimer=useRef<number>(); const current=path.at(-1); const search=useMemo(()=>createSearch(files),[files]);
- const notify=(m:string)=>{setToast(m);window.clearTimeout(toastTimer.current);toastTimer.current=window.setTimeout(()=>setToast(null),2600)};
- const applySearch=(raw:string)=>{const q=raw.trim();setQuery(raw);setFiltered(search(q));setFolderResults(!q?folders:folders.filter(f=>f.name.toLocaleLowerCase().includes(q.toLocaleLowerCase())))};
- useEffect(()=>{document.documentElement.dataset.theme=dark?'dark':'light';localStorage.setItem('ourpixo-theme',dark?'dark':'light')},[dark]);
- useEffect(()=>{const pop=()=>setPath(readFolderPath());window.addEventListener('popstate',pop);const key=(e:KeyboardEvent)=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();setSheet('search')}};window.addEventListener('keydown',key);return()=>{window.removeEventListener('popstate',pop);window.removeEventListener('keydown',key)}},[]);
- useEffect(()=>{let live=true;setLoading(true);setError(null);setActive(null);setQuery('');listDrive(current?.id).then(data=>{if(!live)return;setFolders(data.folders||[]);setFolderResults(data.folders||[]);setFiles(data.files||[]);setFiltered(data.files||[]);setTotal(data.totalCount??data.files.length);const photo=new URLSearchParams(location.search).get('photo');if(photo){const i=data.files.findIndex(x=>x.id===photo);if(i>=0)setActive(i)}}).catch((e)=>{if(live)setError(e instanceof Error?e.message:'Could not load this album')}).finally(()=>live&&setLoading(false));return()=>{live=false}},[current?.id]);
- const navigate=(next:FolderCrumb[])=>{setPath(next);writeFolderPath(next);window.scrollTo({top:0,behavior:'smooth'})}; const openFolder=(f:DriveFolder)=>navigate([...path,{id:f.id,name:f.name}]);
- const shareFolder=async()=>{const url=folderShareUrl(path);try{if(navigator.share)await navigator.share({title:current?.name||'Faith City Gallery',url});else{await navigator.clipboard.writeText(url);notify('Album link copied')}}catch{}};
- const searching=!!query.trim(),results=filtered.length+folderResults.length;
- return <div className="app-shell"><Hero query={query} onSearch={applySearch} onOpenSearch={()=>setSheet('search')} dark={dark} onToggleTheme={()=>setDark(v=>!v)}/>
-  <main className="shell main-content"><section className="album-bar"><button onClick={()=>path.length?navigate(path.slice(0,-1)):navigate([])} className="back-button">{path.length?<ArrowLeftIcon/>:<HomeIcon/>}</button><div className="crumbs"><span>{path.length?'Album path':'Faith City archive'}</span><div><button onClick={()=>navigate([])}>Gallery</button>{path.map((c,i)=><span key={c.id}> / <button onClick={()=>navigate(path.slice(0,i+1))}>{c.name}</button></span>)}</div></div><div className="album-actions"><span>{total} captures</span><button data-tour="share-folder" onClick={shareFolder}><ShareIcon/> <em>Share album</em></button></div></section>
-  {loading?<section className="loading-state"><div className="loading-copy"><span className="spinner"/><div><strong>Opening your archive</strong><small>Organising moments from Google Drive…</small></div></div><div className="gallery-placeholder">{Array.from({length:10}).map((_,i)=><i key={i}/>)}</div></section>:error?<section className="error-state"><InfoIcon/><h2>Archive connection failed</h2><p>{error}</p><button onClick={()=>location.reload()}>Try again</button></section>:<AnimatePresence mode="wait"><motion.div key={current?.id||'root'} initial={{opacity:0,y:12}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-8}} transition={{duration:.38}}>
-   {searching&&<div className="search-summary"><div><SearchIcon/><span>Results for <strong>“{query}”</strong></span></div><span>{results} found</span><button onClick={()=>applySearch('')}>Clear</button></div>}
-   {folderResults.length>0&&<section className="section-block"><div className="section-heading"><div><span>{searching?'Matching collections':current?'Inside this album':'Explore the archive'}</span><h2>{searching?'Albums':current?.name||'Collections'}</h2></div><small>{folderResults.length} {folderResults.length===1?'folder':'folders'}</small></div><FolderGrid folders={folderResults} onSelect={openFolder}/></section>}
-   <section className="section-block photos-section">{filtered.length?<><div className="section-heading"><div><span>{searching?'Matching moments':'Captured moments'}</span><h2>{searching?'Photos':'The gallery'}</h2></div><small>{filtered.length} loaded</small></div><MasonryGallery files={filtered} onOpen={setActive}/></>:searching?<div className="empty-state compact"><SearchIcon/><h3>No matching photos</h3><p>Try a shorter word or search an album name.</p></div>:folders.length===0&&<div className="empty-state"><InfoIcon/><h3>Nothing here yet</h3><p>This album has no photos yet.</p></div>}</section>
-  </motion.div></AnimatePresence>}</main>
-  <MobileNav onHome={()=>{setSheet(null);navigate([])}} onSearch={()=>setSheet('search')} onAlbums={()=>setSheet('albums')} onMore={()=>setSheet('more')}/>
-  <BottomSheet open={sheet==='search'} onClose={()=>setSheet(null)} title="Find in this gallery"><div className="sheet-search"><SearchIcon/><input autoFocus value={query} onChange={e=>applySearch(e.target.value)} placeholder="Search photos and album names"/></div>{query&&<div className="sheet-search-meta"><span>{results} matches in this view</span><button onClick={()=>applySearch('')}>Clear</button></div>}<div className="sheet-search-help">Search checks both photo filenames and the album folders currently on screen.</div></BottomSheet>
-  <BottomSheet open={sheet==='albums'} onClose={()=>setSheet(null)} title="Albums"><div className="sheet-list"><button onClick={()=>{navigate([]);setSheet(null)}}><HomeIcon/>Gallery home</button>{folders.map(f=><button key={f.id} onClick={()=>{openFolder(f);setSheet(null)}}>{f.name}<span>›</span></button>)}</div></BottomSheet>
-  <BottomSheet open={sheet==='more'} onClose={()=>setSheet(null)} title="More"><div className="sheet-list"><button onClick={()=>{shareFolder();setSheet(null)}}><ShareIcon/>Share current album</button><button onClick={()=>setDark(v=>!v)}>{dark?'Use light mode':'Use dark mode'}</button><button onClick={()=>{localStorage.removeItem('ourpixo-tour-v2');location.reload()}}><InfoIcon/>Replay tour</button></div></BottomSheet>
-  <AnimatePresence>{active!==null&&<Lightbox files={filtered} index={active} onClose={()=>setActive(null)} onNavigate={setActive} onToast={notify}/>}</AnimatePresence><OnboardingTour/><Toast message={toast}/>
- </div>
+import { useEffect, useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import Hero from "./components/HeroSection";
+import FolderGrid from "./components/FolderCard";
+import MasonryGallery from "./components/MasonryGallery";
+import Lightbox from "./components/Lightbox";
+import MobileNav from "./components/MobileNav";
+import BottomSheet from "./components/BottomSheet";
+import OnboardingTour from "./components/OnboardingTour";
+import Toast from "./components/Toast";
+import {
+    ArrowLeftIcon,
+    HomeIcon,
+    InfoIcon,
+    SearchIcon,
+    ShareIcon,
+} from "./components/icons";
+import { createSearch } from "./lib/ai-search";
+import { listDrive, type DriveFile, type DriveFolder } from "./lib/drive";
+import {
+    folderShareUrl,
+    readFolderPath,
+    writeFolderPath,
+    type FolderCrumb,
+} from "./lib/navigation";
+type Sheet = "search" | "albums" | "more" | null;
+export default function App() {
+    const [folders, setFolders] = useState<DriveFolder[]>([]),
+        [files, setFiles] = useState<DriveFile[]>([]),
+        [filtered, setFiltered] = useState<DriveFile[]>([]),
+        [folderResults, setFolderResults] = useState<DriveFolder[]>([]),
+        [query, setQuery] = useState("");
+    const [path, setPath] = useState<FolderCrumb[]>(() => readFolderPath());
+    const [loading, setLoading] = useState(true),
+        [error, setError] = useState<string | null>(null),
+        [active, setActive] = useState<number | null>(null),
+        [sheet, setSheet] = useState<Sheet>(null),
+        [toast, setToast] = useState<string | null>(null),
+        [total, setTotal] = useState(0),
+        [dark, setDark] = useState(
+            () => localStorage.getItem("ourpixo-theme") !== "light",
+        );
+    const toastTimer = useRef<number>();
+    // const current = path.at(-1);
+    const current = path.length
+        ? path[path.length - 1]
+        : undefined;
+    const search = useMemo(() => createSearch(files), [files]);
+    const notify = (m: string) => {
+        setToast(m);
+        window.clearTimeout(toastTimer.current);
+        toastTimer.current = window.setTimeout(() => setToast(null), 2600);
+    };
+    const applySearch = (raw: string) => {
+        const q = raw.trim();
+        setQuery(raw);
+        setFiltered(search(q));
+        setFolderResults(
+            !q
+                ? folders
+                : folders.filter((f) =>
+                    f.name.toLocaleLowerCase().includes(q.toLocaleLowerCase()),
+                ),
+        );
+    };
+    useEffect(() => {
+        document.documentElement.dataset.theme = dark ? "dark" : "light";
+        localStorage.setItem("ourpixo-theme", dark ? "dark" : "light");
+    }, [dark]);
+    useEffect(() => {
+        const pop = () => setPath(readFolderPath());
+        window.addEventListener("popstate", pop);
+        const key = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+                e.preventDefault();
+                setSheet("search");
+            }
+        };
+        window.addEventListener("keydown", key);
+        return () => {
+            window.removeEventListener("popstate", pop);
+            window.removeEventListener("keydown", key);
+        };
+    }, []);
+    useEffect(() => {
+        let live = true;
+        setLoading(true);
+        setError(null);
+        setActive(null);
+        setQuery("");
+        listDrive(current?.id)
+            .then((data) => {
+                if (!live) return;
+                setFolders(data.folders || []);
+                setFolderResults(data.folders || []);
+                setFiles(data.files || []);
+                setFiltered(data.files || []);
+                setTotal(data.totalCount ?? data.files.length);
+                const photo = new URLSearchParams(location.search).get("photo");
+                if (photo) {
+                    const i = data.files.findIndex((x) => x.id === photo);
+                    if (i >= 0) setActive(i);
+                }
+            })
+            .catch((e) => {
+                if (live)
+                    setError(
+                        e instanceof Error ? e.message : "Could not load this album",
+                    );
+            })
+            .finally(() => live && setLoading(false));
+        return () => {
+            live = false;
+        };
+    }, [current?.id]);
+    const navigate = (next: FolderCrumb[]) => {
+        setPath(next);
+        writeFolderPath(next);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+    const openFolder = (f: DriveFolder) =>
+        navigate([...path, { id: f.id, name: f.name }]);
+    const shareFolder = async () => {
+        const url = folderShareUrl(path);
+        try {
+            if (navigator.share)
+                await navigator.share({
+                    title: current?.name || "Faith City Gallery",
+                    url,
+                });
+            else {
+                await navigator.clipboard.writeText(url);
+                notify("Album link copied");
+            }
+        } catch { }
+    };
+    const searching = !!query.trim(),
+        results = filtered.length + folderResults.length;
+    return (
+        <div className="app-shell">
+            <Hero
+                query={query}
+                onSearch={applySearch}
+                onOpenSearch={() => setSheet("search")}
+                dark={dark}
+                onToggleTheme={() => setDark((v) => !v)}
+            />
+            <main className="shell main-content">
+                <section className="album-bar">
+                    <button
+                        onClick={() =>
+                            path.length ? navigate(path.slice(0, -1)) : navigate([])
+                        }
+                        className="back-button"
+                    >
+                        {path.length ? <ArrowLeftIcon /> : <HomeIcon />}
+                    </button>
+                    <div className="crumbs">
+                        <span>{path.length ? "Album path" : "Faith City archive"}</span>
+                        <div>
+                            <button onClick={() => navigate([])}>Gallery</button>
+                            {path.map((c, i) => (
+                                <span key={c.id}>
+                                    {" "}
+                                    /{" "}
+                                    <button onClick={() => navigate(path.slice(0, i + 1))}>
+                                        {c.name}
+                                    </button>
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="album-actions">
+                        <span>{total} captures</span>
+                        <button data-tour="share-folder" onClick={shareFolder}>
+                            <ShareIcon /> <em>Share album</em>
+                        </button>
+                    </div>
+                </section>
+                {loading ? (
+                    <section className="loading-state">
+                        <div className="loading-copy">
+                            <span className="spinner" />
+                            <div>
+                                <strong>Opening your archive</strong>
+                                <small>Organising moments from Google Drive…</small>
+                            </div>
+                        </div>
+                        <div className="gallery-placeholder">
+                            {Array.from({ length: 10 }).map((_, i) => (
+                                <i key={i} />
+                            ))}
+                        </div>
+                    </section>
+                ) : error ? (
+                    <section className="error-state">
+                        <InfoIcon />
+                        <h2>Archive connection failed</h2>
+                        <p>{error}</p>
+                        <button onClick={() => location.reload()}>Try again</button>
+                    </section>
+                ) : (
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={current?.id || "root"}
+                            initial={{ opacity: 0, y: 12 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -8 }}
+                            transition={{ duration: 0.38 }}
+                        >
+                            {searching && (
+                                <div className="search-summary">
+                                    <div>
+                                        <SearchIcon />
+                                        <span>
+                                            Results for <strong>“{query}”</strong>
+                                        </span>
+                                    </div>
+                                    <span>{results} found</span>
+                                    <button onClick={() => applySearch("")}>Clear</button>
+                                </div>
+                            )}
+                            {folderResults.length > 0 && (
+                                <section className="section-block">
+                                    <div className="section-heading">
+                                        <div>
+                                            <span>
+                                                {searching
+                                                    ? "Matching collections"
+                                                    : current
+                                                        ? "Inside this album"
+                                                        : "Explore the archive"}
+                                            </span>
+                                            <h2>
+                                                {searching ? "Albums" : current?.name || "Collections"}
+                                            </h2>
+                                        </div>
+                                        <small>
+                                            {folderResults.length}{" "}
+                                            {folderResults.length === 1 ? "folder" : "folders"}
+                                        </small>
+                                    </div>
+                                    <FolderGrid folders={folderResults} onSelect={openFolder} />
+                                </section>
+                            )}
+                            <section className="section-block photos-section">
+                                {filtered.length ? (
+                                    <>
+                                        <div className="section-heading">
+                                            <div>
+                                                <span>
+                                                    {searching ? "Matching moments" : "Captured moments"}
+                                                </span>
+                                                <h2>{searching ? "Photos" : "The gallery"}</h2>
+                                            </div>
+                                            <small>{filtered.length} loaded</small>
+                                        </div>
+                                        <MasonryGallery files={filtered} onOpen={setActive} />
+                                    </>
+                                ) : searching ? (
+                                    <div className="empty-state compact">
+                                        <SearchIcon />
+                                        <h3>No matching photos</h3>
+                                        <p>Try a shorter word or search an album name.</p>
+                                    </div>
+                                ) : (
+                                    folders.length === 0 && (
+                                        <div className="empty-state">
+                                            <InfoIcon />
+                                            <h3>Nothing here yet</h3>
+                                            <p>This album has no photos yet.</p>
+                                        </div>
+                                    )
+                                )}
+                            </section>
+                        </motion.div>
+                    </AnimatePresence>
+                )}
+            </main>
+            <MobileNav
+                onHome={() => {
+                    setSheet(null);
+                    navigate([]);
+                }}
+                onSearch={() => setSheet("search")}
+                onAlbums={() => setSheet("albums")}
+                onMore={() => setSheet("more")}
+            />
+            <BottomSheet
+                open={sheet === "search"}
+                onClose={() => setSheet(null)}
+                title="Find in this gallery"
+            >
+                <div className="sheet-search">
+                    <SearchIcon />
+                    <input
+                        autoFocus
+                        value={query}
+                        onChange={(e) => applySearch(e.target.value)}
+                        placeholder="Search photos and album names"
+                    />
+                </div>
+                {query && (
+                    <div className="sheet-search-meta">
+                        <span>{results} matches in this view</span>
+                        <button onClick={() => applySearch("")}>Clear</button>
+                    </div>
+                )}
+                <div className="sheet-search-help">
+                    Search checks both photo filenames and the album folders currently on
+                    screen.
+                </div>
+            </BottomSheet>
+            <BottomSheet
+                open={sheet === "albums"}
+                onClose={() => setSheet(null)}
+                title="Albums"
+            >
+                <div className="sheet-list">
+                    <button
+                        onClick={() => {
+                            navigate([]);
+                            setSheet(null);
+                        }}
+                    >
+                        <HomeIcon />
+                        Gallery home
+                    </button>
+                    {folders.map((f) => (
+                        <button
+                            key={f.id}
+                            onClick={() => {
+                                openFolder(f);
+                                setSheet(null);
+                            }}
+                        >
+                            {f.name}
+                            <span>›</span>
+                        </button>
+                    ))}
+                </div>
+            </BottomSheet>
+            <BottomSheet
+                open={sheet === "more"}
+                onClose={() => setSheet(null)}
+                title="More"
+            >
+                <div className="sheet-list">
+                    <button
+                        onClick={() => {
+                            shareFolder();
+                            setSheet(null);
+                        }}
+                    >
+                        <ShareIcon />
+                        Share current album
+                    </button>
+                    <button onClick={() => setDark((v) => !v)}>
+                        {dark ? "Use light mode" : "Use dark mode"}
+                    </button>
+                    <button
+                        onClick={() => {
+                            localStorage.removeItem("ourpixo-tour-v2");
+                            location.reload();
+                        }}
+                    >
+                        <InfoIcon />
+                        Replay tour
+                    </button>
+                </div>
+            </BottomSheet>
+            <AnimatePresence>
+                {active !== null && (
+                    <Lightbox
+                        files={filtered}
+                        index={active}
+                        onClose={() => setActive(null)}
+                        onNavigate={setActive}
+                        onToast={notify}
+                    />
+                )}
+            </AnimatePresence>
+            <OnboardingTour />
+            <Toast message={toast} />
+        </div>
+    );
 }
